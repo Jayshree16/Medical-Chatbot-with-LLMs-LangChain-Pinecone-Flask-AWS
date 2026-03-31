@@ -1,26 +1,20 @@
-# Medical-Chatbot-with-LLMs-LangChain-Pinecone-Flask-AWS
+# 🏥 Medical-Chatbot-with-LLMs-LangChain-Pinecone-Flask-AWS
 
-# How to run?
+## 🚀 How to Run?
 
-### STEPS:
-
-Clone the repository
+### 📌 Step 1: Clone the Repository
 
 ```bash
-https://github.com/Jayshree16/Medical-Chatbot-with-LLMs-LangChain-Pinecone-Flask-AWS.git
+git clone https://github.com/Jayshree16/Medical-Chatbot-with-LLMs-LangChain-Pinecone-Flask-AWS.git
+cd Medical-Chatbot-with-LLMs-LangChain-Pinecone-Flask-AWS
 
-STEP 01- Create a conda environment after opening the repository
-
-``bash
+Step 2: Create Conda Environment
+```bash
 conda create -n medibot python=3.10 -y
-```bash
-
-```bash
 conda activate medibot
 ```
 
-
-### STEP 02- install the requirements
-```bash
+Step 3: Install Requirements
+```bash 
 pip install -r requirements.txt
 ```
