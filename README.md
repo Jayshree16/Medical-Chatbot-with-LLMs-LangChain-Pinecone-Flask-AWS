@@ -2,10 +2,11 @@
 
 ## 🚀 How to Run?
 
-### 📌 Step 1: Clone the Repository
+### Step 1: Clone the Repository
 
 ```bash
-git clone https://github.com/Jayshree16/Medical-Chatbot-with-LLMs-LangChain-Pinecone-Flask-AWS.git
+git clone 
+https://github.com/Jayshree16/Medical-Chatbot-with-LLMs-LangChain-Pinecone-Flask-AWS.git
 cd Medical-Chatbot-with-LLMs-LangChain-Pinecone-Flask-AWS
 ```
 
