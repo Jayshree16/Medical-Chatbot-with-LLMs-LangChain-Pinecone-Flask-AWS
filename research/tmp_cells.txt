@@ -1,0 +1,137 @@
+%pwd
+---
+import os
+os.chdir("../")
+---
+%pwd
+---
+print("Hello")
+---
+from langchain.document_loaders import PyPDFLoader, DirectoryLoader
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+---
+#Extract text from pdf files:
+def load_pdf_files(data):
+    loader = DirectoryLoader(
+        data,
+        glob ="*.pdf",
+        loader_cls = PyPDFLoader
+    )
+    documents = loader.load()
+    return documents
+---
+# extracted_data = load_pdf_files("../data")
+
+extracted_data = load_pdf_files(r"c:\Users\JAYSHREE\Desktop\GENAI\RAG\LLMAPP\Medical-Chatbot-with-LLMs-LangChain-Pinecone-Flask-AWS\data")
+
+---
+extracted_data 
+---
+len(extracted_data)
+---
+from typing import List
+from langchain.schema import Document
+
+def filter_to_minimal_docs(docs: List[Document]) ->[Document]:
+    """
+    Given a list of Document objects, return a new list of Document objects
+    containing only 'source' in metadata and the original page_content.
+    """
+    minimal_docs: List[Document] = []
+    for doc in docs:
+        src = doc.metadata.get("source")
+        minimal_docs.append(
+            Document(
+                page_content=doc.page_content,
+                metadata={"source": src}
+            )
+        )
+    return minimal_docs
+---
+minimal_docs = filter_to_minimal_docs(extracted_data)
+---
+minimal_docs
+---
+#Split the document into the smaller chunks
+def text_split(minimal_docs):
+    text_splitter = RecursiveCharacterTextSplitter(
+        chunk_size = 500,
+        chunk_overlap = 20,
+    )
+    texts_chunk = text_splitter.split_documents(minimal_docs)
+    return texts_chunk
+---
+texts_chunk = text_split(minimal_docs)
+print(f"Number of chunks: {len(texts_chunk)}")
+---
+texts_chunk
+---
+from langchain.embeddings import HuggingFaceEmbeddings
+def download_embeddings():
+    """
+    Download and return the HugginngFace embeddings model.
+    """
+    model_name = "sentence-transformers/all-MiniLM-L6-v2"
+    embeddings = HuggingFaceEmbeddings(
+        model_name = model_name,
+    )
+    return embeddings
+
+embedding = download_embeddings()
+---
+embedding
+---
+vector = embedding.embed_query("hello world")
+vector
+---
+print("vector length: ",len(vector))
+---
+from dotenv import load_dotenv, find_dotenv
+import os
+
+# find_dotenv() will automatically look in parent folders to find the .env file
+load_dotenv(find_dotenv())
+
+
+---
+PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")
+Ollama_API_KEY = os.getenv("Ollama_API_KEY")
+
+os.environ["PINECONE_API_KEY"] = PINECONE_API_KEY
+os.environ["Ollama_API_KEY"] = Ollama_API_KEY
+---
+import os
+from pinecone import Pinecone
+from dotenv import load_dotenv
+
+# 1. Force the notebook to reload the updated .env file (override=True is important!)
+dotenv_path = r"c:\Users\JAYSHREE\Desktop\GENAI\RAG\LLMAPP\Medical-Chatbot-with-LLMs-LangChain-Pinecone-Flask-AWS\.env"
+load_dotenv(dotenv_path, override=True)
+
+# 2. Fetch the newly loaded key
+PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")
+
+# 3. Print a check to make sure it actually worked before trying Pinecone
+if PINECONE_API_KEY is None:
+    print("❌ ERROR: Key is still None! The .env file was not read properly.")
+else:
+    print("✅ Key loaded successfully!")
+    # 4. Pass it to Pinecone
+    pc = Pinecone(api_key=PINECONE_API_KEY)
+    print("✅ Connected to Pinecone!")
+
+---
+pc
+---
+from pinecone import ServerlessSpec
+index_name = "medical-chatbot"
+
+if not pc.has_index(index_name):
+    pc.create_index(
+        name = index_name,
+        dimension = 384,
+        metric = "cosine",
+        spec =ServerlessSpec(cloud="aws", region="us-east-1")
+    )
+
+index = pc.index(index_name)
