@@ -40,7 +40,7 @@ os.environ["GROQ_API_KEY"] = GROQ_API_KEY
 # -------------------------------------------------
 # 1. LLM - Groq (llama3 is fast and free on Groq)
 chat_model = ChatGroq(
-    model="llama-3.3-70b-versatile",   # alternatives: mixtral-8x7b-32768, llama3-70b-8192
+    model="llama-3.3-70b-versatile",   # current active Groq model (as of 2026)
     temperature=0.4,
     groq_api_key=GROQ_API_KEY,
 )
@@ -132,5 +132,5 @@ def query():
 
 
 if __name__ == "__main__":
-    # Run on 0.0.0.0 so the container / VM can expose it
-    app.run(host="0.0.0.0", port=8080, debug=True)
+    port = int(os.environ.get("PORT", 8080))  # Render sets PORT dynamically
+    app.run(host="0.0.0.0", port=port, debug=False)  # debug=False in production

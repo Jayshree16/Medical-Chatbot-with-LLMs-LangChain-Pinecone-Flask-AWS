@@ -1,11 +1,11 @@
-# 🏥 Medical Chatbot with LLMs, LangChain, Pinecone, Flask & AWS
+# 🏥 Medical Chatbot with LLMs, LangChain, Pinecone, Flask & Render
 
 ![Python](https://img.shields.io/badge/Python-3.10-blue?style=flat-square&logo=python)
 ![Flask](https://img.shields.io/badge/Flask-3.1.1-black?style=flat-square&logo=flask)
 ![LangChain](https://img.shields.io/badge/LangChain-0.3.7-green?style=flat-square)
 ![Groq](https://img.shields.io/badge/Groq-AI-orange?style=flat-square)
 ![Pinecone](https://img.shields.io/badge/Pinecone-VectorStore-purple?style=flat-square)
-![Docker](https://img.shields.io/badge/AWS-Ready-yellow?style=flat-square&logo=amazonaws)
+![Render](https://img.shields.io/badge/Render-Deployed-4353FF?style=flat-square&logo=render)
 
 > An intelligent medical question-answering chatbot powered by RAG (Retrieval-Augmented Generation). Ask any medical question and get accurate, context-aware answers sourced directly from medical literature.
 
@@ -54,7 +54,7 @@ Chat UI Response
 | **Web Framework** | Flask 3.1.1 |
 | **PDF Loader** | PyPDF |
 | **Frontend** | HTML, CSS, Bootstrap 4, jQuery |
-| **Deployment** | AWS (EC2 / Elastic Beanstalk) |
+| **Deployment** | Render (Free Tier) |
 
 ---
 
@@ -81,6 +81,8 @@ Medical-Chatbot/
 │
 ├── app.py                 # Flask app + RAG chain
 ├── store_index.py         # PDF ingestion + Pinecone indexing
+├── render.yaml            # Render deployment config
+├── Procfile               # Render start command
 ├── requirements.txt
 ├── setup.py
 ├── .env                   # API keys (never commit this!)
@@ -182,19 +184,54 @@ python-dotenv==1.1.0
 
 ---
 
-## ☁️ AWS Deployment
+## ☁️ Deploy on Render (Free)
 
-This app is AWS-ready. You can deploy it to:
+This app can be deployed for free on [Render](https://render.com). Since all vector data lives in Pinecone (cloud), no persistent disk is needed.
 
-- **EC2** — Run `python app.py` on a `t2.micro` or larger instance
-- **Elastic Beanstalk** — Package the app and deploy via EB CLI
+### Step 1: Add a `render.yaml` to your project root
+
+```yaml
+services:
+  - type: web
+    name: medical-chatbot
+    runtime: python
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "python app.py"
+    envVars:
+      - key: PINECONE_API_KEY
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
+```
+
+### Step 2: Add a `Procfile` to your project root
+
+```
+web: python app.py
+```
+
+### Step 3: Push to GitHub
 
 ```bash
-# Example EC2 setup after SSH into instance
-sudo apt update
-conda activate medibot
-python app.py
+git add .
+git commit -m "Add Render deployment config"
+git push origin main
 ```
+
+### Step 4: Deploy on Render
+
+1. Go to [render.com](https://render.com) → **New** → **Web Service**
+2. Connect your GitHub repository
+3. Set these values:
+   - **Environment:** Python
+   - **Build Command:** `pip install -r requirements.txt`
+   - **Start Command:** `python app.py`
+4. Add **Environment Variables** in the Render dashboard:
+   - `PINECONE_API_KEY` → your Pinecone key
+   - `GROQ_API_KEY` → your Groq key
+5. Click **Deploy** ✅
+
+> ⚠️ **Free tier note:** The app sleeps after 15 minutes of inactivity. The first request after sleep may take ~30 seconds to wake up. This is normal on Render's free plan.
 
 ---
 
