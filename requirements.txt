@@ -1,10 +1,26 @@
-langchain==0.3.26
-flask==3.1.1
-sentence-transformers==4.1.0
-pypdf==5.6.1
-python-dotenv==1.1.0
-langchain-pinecone==0.2.8
-langchain-openai==0.3.24
-langchain-community==0.3.26
--e.
+# Core LangChain stack — all versions pinned for compatibility
+langchain==0.3.7
+langchain-core==0.3.21
+langchain-community==0.3.7
+langchain-openai==0.2.5
+langchain-pinecone==0.2.0
+langchain-groq==0.2.1
 
+# Vector store
+pinecone-client==5.0.1
+
+# LLM / Embeddings
+langchain-huggingface==0.1.2
+sentence-transformers==3.3.1
+
+# Document loading
+pypdf==5.1.0
+
+# Web framework
+flask==3.1.1
+
+# Utilities
+python-dotenv==1.1.0
+
+# Local package (editable install)
+-e .
