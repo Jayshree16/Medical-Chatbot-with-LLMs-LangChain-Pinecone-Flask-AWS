@@ -4,8 +4,9 @@
 from flask import Flask, render_template, jsonify, request
 from src.helper import download_huggingface_embeddings
 
-# Use the official langchain-pinecone package (NOT the deprecated community import)
-from langchain_pinecone import PineconeVectorStore
+# Use langchain-community Pinecone wrapper (Python 3.8+ compatible)
+from langchain_community.vectorstores import Pinecone as PineconeVectorStore
+from pinecone import Pinecone as PineconeClient
 
 # Use Groq LLM (matches the GROQ_API_KEY in .env)
 from langchain_groq import ChatGroq
@@ -49,9 +50,10 @@ chat_model = ChatGroq(
 embeddings = download_huggingface_embeddings()
 
 # 3. Pinecone vector store (assumes the index already exists — run store_index.py first)
+pc = PineconeClient(api_key=PINECONE_API_KEY)
 docsearch = PineconeVectorStore.from_existing_index(
     embedding=embeddings,
-    index_name="medical-chatbot",   # must match the index created in store_index.py
+    index_name="medical-chatbot",
 )
 
 # -------------------------------------------------
